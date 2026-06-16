@@ -19,3 +19,16 @@ chmod +x scripts/build.sh
 Remarques:
 - Ajustez le chemin de `lib/servlet-api.jar` si nécessaire.
 - Déployez le fichier `build/Sprint_MrNaina.war` dans un conteneur servlet (Tomcat, Jetty).
+
+# Sprint 0
+
+Projet de test Servlet + Tomcat.
+
+Fonctionnalités :
+
+- Servlet
+- doGet()
+- processRequest()
+- web.xml
+- Utilisation d'un jar
+- Déploiement Tomcat
