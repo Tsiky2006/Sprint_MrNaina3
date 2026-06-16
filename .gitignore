@@ -4,6 +4,8 @@
 # Java
 *.class
 *.jar
+!lib/servlet-api.jar
+!lib/mysql-connector-j-9.5.0.jar
 
 # IDE
 /.idea/
