@@ -18,7 +18,7 @@ Fonctionnalité Sprint(0) :
 * ao anaty application de test
 * application test => @navigateur
 
-* objectif : pring mvc, spring API 
+* objectif : spring mvc, spring API 
 - Emplcontroller @ noter, manana methode @ Getmapping => mety mbola manana anotation ko io @ lister(RequestMapping)
 - Ilay class fantany mapping hoe iza ny url mifandray, ainy ko manao banding automatiquement 
 - ilay parametre de recuperer automatique 
@@ -27,6 +27,8 @@ Fonctionnalité Sprint(0) :
   dooly no afaka appliquena anazy , mila omena ny anarany, inona dooly variable, anarana attribut, 
   lay anarana afaka atao am le anotation
 - creer class annotena any le anotation vo créena io 
+
+- Maintenant l’objectif est de faire comme Spring : URL /employe/liste → EmployeController → méthode liste()
 
 Fonctionnalité Sprint(1) : 
 
