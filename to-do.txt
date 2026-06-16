@@ -6,6 +6,7 @@ Décomposena le problem :
 - Il faut voir les listes des pull request qui est déja fini
 - Raha 14 Sprint de mila Pullrequest Git any flow
 - Il ne faut pas tester dans le code
+- Branch deja crée
 
 Fonctionnalité Sprint(0) :
 * crée servlet ray do get => do list => ProcessRequest => outsprint(geturl) => modif any anaty test
