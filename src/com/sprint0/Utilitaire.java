@@ -2,7 +2,8 @@ package com.sprint0;
 
 public class Utilitaire {
 
-    public static String message(String url) {
+    public static String getMessage(String url) {
         return "URL appelée : " + url;
     }
+
 }
