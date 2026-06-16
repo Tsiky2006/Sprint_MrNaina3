@@ -1,0 +1,13 @@
+# Build output
+/build/
+
+# Java
+*.class
+*.jar
+
+# IDE
+/.idea/
+*.iml
+
+# OS
+.DS_Store
