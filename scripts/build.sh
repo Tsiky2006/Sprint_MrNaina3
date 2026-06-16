@@ -1,14 +1,26 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-mkdir -p "$ROOT_DIR/build/classes"
+PROJECT_NAME="Sprint_MrNaina3"
+SERVLET_JAR="lib/servlet-api.jar"
 
-# compile sources (adjust servlet jar path if needed)
-javac -cp "$ROOT_DIR/lib/servlet-api.jar" -d "$ROOT_DIR/build/classes" "$ROOT_DIR/src/com/sprint0"/*.java
+rm -rf build
+mkdir -p build/classes
+mkdir -p build/webapp/WEB-INF/classes
+mkdir -p WebContent/WEB-INF/lib
 
-# create WAR-like archive (simple)
-rm -f "$ROOT_DIR/build/Sprint_MrNaina.war"
-jar cvf "$ROOT_DIR/build/Sprint_MrNaina.war" -C "$ROOT_DIR/WebContent" . -C "$ROOT_DIR/build/classes" .
+javac -d build/classes src/com/sprint0/Utilitaire.java
 
-echo "Build terminé : build/Sprint_MrNaina.war"
+jar cf WebContent/WEB-INF/lib/utilitaire.jar \
+-C build/classes com/sprint0/Utilitaire.class
+
+javac -cp "$SERVLET_JAR:WebContent/WEB-INF/lib/utilitaire.jar" \
+-d build/webapp/WEB-INF/classes \
+src/com/sprint0/TestServlet.java
+
+cp -r WebContent/* build/webapp/
+
+cd build/webapp
+jar cf "../${PROJECT_NAME}.war" .
+cd ../..
+
+echo "Build terminé : build/${PROJECT_NAME}.war"
