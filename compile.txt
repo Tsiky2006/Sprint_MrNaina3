@@ -1,0 +1,67 @@
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ^C
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls WebContent/WEB-INF/lib
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls scripts
+build.sh
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ javac -d build/classes src/com/sprint0/Utilitaire.java
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ jar cf WebContent/WEB-INF/lib/utilitaire.jar -C build/classes com/sprint0/Utilitaire.class
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls WebContent/WEB-INF/lib
+utilitaire.jar
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ chmod +x scripts/build.sh
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ./scripts/build.sh
+Build terminé : build/Sprint_MrNaina3.war
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ cp build/Sprint_MrNaina3.war ~/apache-tomcat-11.0.7/webapps/
+cp: impossible de créer le fichier standard '/home/fanomezantsoa/apache-tomcat-11.0.7/webapps/': Aucun fichier ou dossier de ce nom
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ find ~ -type d -name "apache-tomcat*" 2>/dev/null
+/home/fanomezantsoa/Documents/apache-tomcat-10.1.52
+^C
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ^C
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ cp build/Sprint_MrNaina3.war /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps/
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ cd /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin
+./startup.sh
+Cannot find ./catalina.sh
+The file is absent or does not have execute permission
+This file is needed to run this program
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cd /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin
+./startup.sh
+Cannot find ./catalina.sh
+The file is absent or does not have execute permission
+This file is needed to run this program
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cd /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin
+chmod +x *.sh
+./startup.sh
+Using CATALINA_BASE:   /home/fanomezantsoa/Documents/apache-tomcat-10.1.52
+Using CATALINA_HOME:   /home/fanomezantsoa/Documents/apache-tomcat-10.1.52
+Using CATALINA_TMPDIR: /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/temp
+Using JRE_HOME:        /usr
+Using CLASSPATH:       /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin/bootstrap.jar:/home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin/tomcat-juli.jar
+Using CATALINA_OPTS:   
+Tomcat started.
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cd /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin
+chmod +x *.sh
+./startup.sh
+Using CATALINA_BASE:   /home/fanomezantsoa/Documents/apache-tomcat-10.1.52
+Using CATALINA_HOME:   /home/fanomezantsoa/Documents/apache-tomcat-10.1.52
+Using CATALINA_TMPDIR: /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/temp
+Using JRE_HOME:        /usr
+Using CLASSPATH:       /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin/bootstrap.jar:/home/fanomezantsoa/Documents/apache-tomcat-10.1.52/bin/tomcat-juli.jar
+Using CATALINA_OPTS:   
+Tomcat started.
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cp build/Sprint_MrNaina3.war /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps/
+cp: impossible d'évaluer 'build/Sprint_MrNaina3.war': Aucun fichier ou dossier de ce nom
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cd /home/fanomezantsoa/Documents/Hajaina/Sprint_MrNaina3~
+cd : commande introuvable
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ ^C
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/apache-tomcat-10.1.52/bin$ cd /home/fanomezantsoa/Documents/Hajaina/Sprint_MrNaina3
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls build
+classes  Sprint_MrNaina3.war  webapp
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ cp build/Sprint_MrNaina3.war \
+/home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps/
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps
+Banque   Banques.war  cheque_encaisser      docs      forage         Forage_rano-1.war  host-manager  ROOT             Sprint_MrNaina3.war
+Banques  Banque.war   cheque_encaisser.war  examples  Forage_rano-1  forage.war         manager       Sprint_MrNaina3
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ cp build/Sprint_MrNaina3.war \
+/home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps/
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ ls /home/fanomezantsoa/Documents/apache-tomcat-10.1.52/webapps
+Banque   Banques.war  cheque_encaisser      docs      forage         Forage_rano-1.war  host-manager  ROOT             Sprint_MrNaina3.war
+Banques  Banque.war   cheque_encaisser.war  examples  Forage_rano-1  forage.war         manager       Sprint_MrNaina3
+(base) fanomezantsoa@fanomezantsoa-Inspiron-16-5620:~/Documents/Hajaina/Sprint_MrNaina3$ 
