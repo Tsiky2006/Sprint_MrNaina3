@@ -8,6 +8,8 @@ Décomposena le problem :
 - Il ne faut pas tester dans le code
 - Branch deja crée
 
+
+
 Fonctionnalité Sprint(0) :
 * crée servlet ray do get => do list => ProcessRequest => outsprint(geturl) => modif any anaty test
 * test deploy any à tomcat fa tsy ilay framework
@@ -30,7 +32,59 @@ Fonctionnalité Sprint(0) :
 
 - Maintenant l’objectif est de faire comme Spring : URL /employe/liste → EmployeController → méthode liste()
 
+
+
+
+
 Fonctionnalité Sprint(1) : 
+Objectif : annotation am class controller,juste pour dire que cet class est controller
+1) creer au niveau du framework : 
+2) test : cree class ray de deployena any am tomcat exemple : TestCOntroller => anotena am le controller 
+izay class declarenna de tokony ho fatatra dooly hoe reto le controller
+
+Mila bout de code : tonga de mandroka ao anaty class path rehetra, na exectuer au premier appel front servlet
+Mapiasa Listener ,Demarage Appli web 
+mapiasa init : ao anaty servlet : atsoina am premier appel any le servlet
+afaka implementer Listener
+il savoir tou le controller
+Ao anay FrontServlet : List<string> init() => miantso any le utilitaire, anarany le class annoter, hoe mandeha fotsiny le izy 
+rehef exectuer init parcourrir ny class path , na develop mapiasa tsika mamorina any le package,
+framework : tsy maintsy misy infromations any le developpeur : par convontion soit par configuration possible les 2 à la fois
+web.xml : afaka manomehy variable, manisy anarana variable, de valeur ilay misy controller am application de test 
+code framework tsy deploien zany fa mijanona .jar
+annotation controller => soit izy retraretra de tsara indrindra omena liste package
+raha manana anarana package ah de aona ny ananako any le 
+utilitaire class no misy methode ray izay mandray any le package
+method ray : misy ve ty sa tsisy au niveau class, attribut, sa methode 
+
+
+
+
+
+Fonctionnalité Sprint (2) : 
+ON a la liste des controller :
+tanjona mahazo url => iza ny controller associer amnio url
+crée annnotation azo ampetraka am metode , mila variable 
+Emplcontroller class zany io 
+manana methode ray izay ata hoe list de io annotena am url iray urlmapping 
+annotation créena any am framework d emandray parametre, ("/emplent")
+rehefa tsy mabnisy url de io variable par defaut
+/emp/list Empcontroller=> liste
+/emp/new Empcontroller => create  zavatra avoka am proces request
+
+
+rehefa ty url ty no apotra d ety methode miantso aniny zany
+ilay stockena anjaray 
+fa ilay controller no stockena 
+mila list any le url 
+
+rehefa tsy fantatra le url ; de eto ny url hoe eo no misy any le list 
+tenenina izay misy any le url 
+
+rhefa tsy fantatra de hoe reto iany fantatra 
+
+
+
 
 
 
