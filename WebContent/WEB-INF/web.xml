@@ -26,4 +26,15 @@ version="6.0">
         </url-pattern>
     </servlet-mapping>
 
+
+    <servlet>
+    <servlet-name>FrontController</servlet-name>
+    <servlet-class>com.sprint0.FrontController</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>FrontController</servlet-name>
+    <url-pattern>/employe/*</url-pattern>
+</servlet-mapping>
+
 </web-app>
