@@ -1,15 +1,15 @@
-package com.sprint0;
+package com.framework;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import com.sprint0.annotation.Controller;
-import com.sprint0.annotation.RequestMapping;
-import com.sprint0.annotation.GetMapping;
-import com.sprint0.annotation.Param;
-import com.sprint0.controller.EmployeController;
+import com.framework.annotation.Controller;
+import com.framework.annotation.GetMapping;
+import com.framework.annotation.Param;
+import com.framework.annotation.RequestMapping;
+import com.test.controller.EmployeController;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
