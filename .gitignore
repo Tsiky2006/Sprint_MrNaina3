@@ -6,6 +6,7 @@
 *.jar
 !lib/servlet-api.jar
 !lib/mysql-connector-j-9.5.0.jar
+!test-app/WebContent/WEB-INF/lib/framework.jar
 
 # IDE
 /.idea/

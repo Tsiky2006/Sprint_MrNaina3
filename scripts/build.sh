@@ -4,27 +4,29 @@ PROJECT_NAME="Sprint_MrNaina3"
 SERVLET_JAR="$HOME/Documents/tomcat11/lib/servlet-api.jar"
 
 rm -rf build
+rm -f framework.jar
+rm -f test-app/WebContent/WEB-INF/lib/framework.jar
 
-mkdir -p build/classes
+mkdir -p build/framework-classes
+mkdir -p build/test-classes
 mkdir -p build/webapp/WEB-INF/classes
-mkdir -p build/webapp/WEB-INF/lib
-mkdir -p WebContent/WEB-INF/lib
+mkdir -p test-app/WebContent/WEB-INF/lib
 
-javac -d build/classes \
-src/com/sprint0/Utilitaire.java
+javac -cp "$SERVLET_JAR:test-app/src" \
+-d build/framework-classes \
+framework/src/com/framework/annotation/*.java \
+framework/src/com/framework/FrontController.java
 
-jar cf WebContent/WEB-INF/lib/utilitaire.jar \
--C build/classes com/sprint0/Utilitaire.class
+jar cf framework.jar -C build/framework-classes .
 
-javac -cp "$SERVLET_JAR:WebContent/WEB-INF/lib/utilitaire.jar" \
--d build/webapp/WEB-INF/classes \
-src/com/sprint0/annotation/*.java \
-src/com/sprint0/controller/*.java \
-src/com/sprint0/TestServlet.java \
-src/com/sprint0/FrontController.java \
-src/com/sprint0/Utilitaire.java
+cp framework.jar test-app/WebContent/WEB-INF/lib/
 
-cp -r WebContent/* build/webapp/
+javac -cp "$SERVLET_JAR:framework.jar" \
+-d build/test-classes \
+test-app/src/com/test/controller/EmployeController.java
+
+cp -r build/test-classes/* build/webapp/WEB-INF/classes/
+cp -r test-app/WebContent/* build/webapp/
 
 cd build/webapp
 jar cf "../${PROJECT_NAME}.war" .
