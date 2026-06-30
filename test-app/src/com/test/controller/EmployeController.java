@@ -1,21 +1,24 @@
 package com.test.controller;
 
 import com.framework.annotation.Controller;
-import com.framework.annotation.GetMapping;
 import com.framework.annotation.Param;
-import com.framework.annotation.RequestMapping;
+import com.framework.annotation.UrlMapping;
 
 @Controller
-@RequestMapping("/employe")
 public class EmployeController {
 
-    @GetMapping("/liste")
-    public String liste() {
+    @UrlMapping("/emp/list")
+    public String list() {
         return "Liste des employés";
     }
 
-    @GetMapping("/detail")
-    public String detail(@Param("id") int id) {
-        return "Détail employé avec id = " + id;
+    @UrlMapping("/emp/new")
+    public String create() {
+        return "Création d'un employé";
     }
-}
+
+    @UrlMapping("/andrana")
+    public void andrana() {
+
+     }
+    }
