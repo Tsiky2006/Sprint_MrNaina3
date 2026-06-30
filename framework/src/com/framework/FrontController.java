@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.framework.annotation.Controller;
-import com.framework.annotation.GetMapping;
 import com.framework.annotation.Param;
-import com.framework.annotation.RequestMapping;
+import com.framework.annotation.UrlMapping;
+import com.framework.core.Mapping;
 import com.framework.util.ControllerScanner;
 
 import jakarta.servlet.ServletException;
@@ -20,22 +22,55 @@ import jakarta.servlet.http.HttpServletResponse;
 public class FrontController extends HttpServlet {
 
     private List<Class<?>> controllers;
+    private Map<String, Mapping> urlMappings;
 
     @Override
     public void init() throws ServletException {
         try {
             String packageName = getServletContext().getInitParameter("controller-package");
 
-            if (packageName == null || packageName.trim().isEmpty()) {
+            if (packageName == null || packageName.isEmpty()) {
                 throw new ServletException("Paramètre controller-package manquant dans web.xml");
             }
 
             controllers = ControllerScanner.scan(packageName);
+            urlMappings = new HashMap<>();
 
-            System.out.println("Controllers trouvés : " + controllers.size());
+            for (Class<?> controllerClass : controllers) {
 
+                Method[] methods = controllerClass.getDeclaredMethods();
+
+                for (Method method : methods) {
+
+                    if (method.isAnnotationPresent(UrlMapping.class)) {
+
+                        UrlMapping urlMapping = method.getAnnotation(UrlMapping.class);
+                        String url = urlMapping.value();
+
+                        if (url == null || url.trim().isEmpty()) {
+                            url = "/" + controllerClass.getSimpleName() + "/" + method.getName();
+                        }
+
+                        urlMappings.put(
+                                url,
+                                new Mapping(
+                                        controllerClass.getName(),
+                                        method.getName()
+                                )
+                        );
+                    }
+                }
+            }
+
+            System.out.println("=== Controllers trouves ===");
             for (Class<?> controller : controllers) {
-                System.out.println("Controller : " + controller.getName());
+                System.out.println(controller.getName());
+            }
+
+            System.out.println("=== UrlMappings trouves ===");
+            for (String url : urlMappings.keySet()) {
+                Mapping mapping = urlMappings.get(url);
+                System.out.println(url + " -> " + mapping.getClassName() + "." + mapping.getMethodName());
             }
 
         } catch (Exception e) {
@@ -55,57 +90,55 @@ public class FrontController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            for (Class<?> clazz : controllers) {
+            Mapping mapping = urlMappings.get(path);
 
-                if (!clazz.isAnnotationPresent(Controller.class)) {
-                    continue;
+            if (mapping == null) {
+                out.println("<html>");
+                out.println("<body>");
+                out.println("<h1>URL inconnue</h1>");
+                out.println("<p>URL demandée : " + path + "</p>");
+                out.println("<h3>URLs disponibles :</h3>");
+                out.println("<ul>");
+
+                for (String url : urlMappings.keySet()) {
+                    out.println("<li>" + url + "</li>");
                 }
 
-                RequestMapping requestMapping = clazz.getAnnotation(RequestMapping.class);
-                String baseUrl = "";
+                out.println("</ul>");
+                out.println("</body>");
+                out.println("</html>");
+                return;
+            }
 
-                if (requestMapping != null) {
-                    baseUrl = requestMapping.value();
-                }
+            Class<?> clazz = Class.forName(mapping.getClassName());
+            Object controllerInstance = clazz.getDeclaredConstructor().newInstance();
 
-                Object controllerInstance = clazz.getDeclaredConstructor().newInstance();
+            Method methodToCall = null;
 
-                Method[] methods = clazz.getDeclaredMethods();
-
-                for (Method method : methods) {
-
-                    if (!method.isAnnotationPresent(GetMapping.class)) {
-                        continue;
-                    }
-
-                    GetMapping getMapping = method.getAnnotation(GetMapping.class);
-                    String fullUrl = baseUrl + getMapping.value();
-
-                    if (fullUrl.equals(path)) {
-
-                        Object[] arguments = buildArguments(method, request);
-                        Object result = method.invoke(controllerInstance, arguments);
-
-                        out.println("<html>");
-                        out.println("<head>");
-                        out.println("<meta charset='UTF-8'>");
-                        out.println("<title>Mini Framework MVC</title>");
-                        out.println("</head>");
-                        out.println("<body>");
-                        out.println("<h1>Mini Spring MVC OK</h1>");
-                        out.println("<p>URL appelée : " + path + "</p>");
-                        out.println("<p>Controller : " + clazz.getName() + "</p>");
-                        out.println("<p>Méthode : " + method.getName() + "</p>");
-                        out.println("<p>Résultat : " + result + "</p>");
-                        out.println("</body>");
-                        out.println("</html>");
-                        return;
-                    }
+            for (Method method : clazz.getDeclaredMethods()) {
+                if (method.getName().equals(mapping.getMethodName())) {
+                    methodToCall = method;
+                    break;
                 }
             }
 
-            out.println("<h1>404 - URL non trouvée</h1>");
-            out.println("<p>URL : " + path + "</p>");
+            if (methodToCall == null) {
+                out.println("<h1>Méthode introuvable</h1>");
+                return;
+            }
+
+            Object[] arguments = buildArguments(methodToCall, request);
+            Object result = methodToCall.invoke(controllerInstance, arguments);
+
+            out.println("<html>");
+            out.println("<body>");
+            out.println("<h1>Sprint2 - UrlMapping OK</h1>");
+            out.println("<p>URL appelée : " + path + "</p>");
+            out.println("<p>Controller : " + mapping.getClassName() + "</p>");
+            out.println("<p>Méthode : " + mapping.getMethodName() + "</p>");
+            out.println("<p>Résultat : " + result + "</p>");
+            out.println("</body>");
+            out.println("</html>");
 
         } catch (Exception e) {
             out.println("<h1>Erreur</h1>");
