@@ -1,7 +1,9 @@
 package com.framework;
 
 import com.framework.core.Mapping;
+import com.framework.core.Model;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 public class FrontController extends HttpServlet {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -26,6 +29,17 @@ public class FrontController extends HttpServlet {
 
             if (urlMapping == null) {
                 throw new Exception("urlMapping introuvable dans ServletContext. Vérifie ApplicationListener.");
+            }
+
+            String viewPrefix = (String) getServletContext().getAttribute("viewPrefix");
+            String viewSuffix = (String) getServletContext().getAttribute("viewSuffix");
+
+            if (viewPrefix == null || viewPrefix.trim().isEmpty()) {
+                viewPrefix = "/WEB-INF/views/";
+            }
+
+            if (viewSuffix == null || viewSuffix.trim().isEmpty()) {
+                viewSuffix = ".jsp";
             }
 
             String url = request.getRequestURI();
@@ -62,18 +76,40 @@ public class FrontController extends HttpServlet {
 
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
 
-            Object result = method.invoke(controllerInstance);
+            Model model = new Model();
+            Object result;
 
-            response.getWriter().println("<h1>Résultat Sprint 4</h1>");
-            response.getWriter().println("<p>URL appelée : " + url + "</p>");
-            response.getWriter().println("<p>Controller : " + controllerClass.getName() + "</p>");
-            response.getWriter().println("<p>Méthode : " + method.getName() + "</p>");
-
-            if (result != null) {
-                response.getWriter().println("<p>Résultat : " + result.toString() + "</p>");
+            if (method.getParameterCount() == 0) {
+                result = method.invoke(controllerInstance);
+            } else if (
+                    method.getParameterCount() == 1 &&
+                    method.getParameterTypes()[0].equals(Model.class)
+            ) {
+                result = method.invoke(controllerInstance, model);
             } else {
-                response.getWriter().println("<p>Résultat : null</p>");
+                throw new Exception("La méthode " + method.getName()
+                        + " doit avoir 0 paramètre ou 1 paramètre de type Model");
             }
+
+            if (!(result instanceof String)) {
+                throw new Exception("La méthode " + method.getName()
+                        + " doit retourner un String");
+            }
+
+            for (Map.Entry<String, Object> entry : model.getData().entrySet()) {
+                request.setAttribute(entry.getKey(), entry.getValue());
+            }
+
+            String viewName = (String) result;
+
+            if (viewName.startsWith("/")) {
+                viewName = viewName.substring(1);
+            }
+
+            String viewPath = viewPrefix + viewName + viewSuffix;
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher(viewPath);
+            dispatcher.forward(request, response);
 
         } catch (Exception e) {
             throw new ServletException("Erreur dans FrontController", e);
