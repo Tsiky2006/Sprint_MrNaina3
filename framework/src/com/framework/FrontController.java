@@ -1,5 +1,6 @@
 package com.framework;
 
+import com.framework.core.FrameworkContext;
 import com.framework.core.Mapping;
 import com.framework.core.Model;
 
@@ -27,8 +28,15 @@ public class FrontController extends HttpServlet {
             HashMap<String, Mapping> urlMapping =
                     (HashMap<String, Mapping>) getServletContext().getAttribute("urlMapping");
 
+            FrameworkContext frameworkContext =
+                    (FrameworkContext) getServletContext().getAttribute("frameworkContext");
+
             if (urlMapping == null) {
-                throw new Exception("urlMapping introuvable dans ServletContext. Vérifie ApplicationListener.");
+                throw new Exception("urlMapping introuvable dans ServletContext.");
+            }
+
+            if (frameworkContext == null) {
+                throw new Exception("frameworkContext introuvable dans ServletContext.");
             }
 
             String viewPrefix = (String) getServletContext().getAttribute("viewPrefix");
@@ -74,7 +82,7 @@ public class FrontController extends HttpServlet {
             Class<?> controllerClass = mapping.getControllerClass();
             Method method = mapping.getMethod();
 
-            Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
+            Object controllerInstance = frameworkContext.getBean(controllerClass);
 
             Model model = new Model();
             Object result;
