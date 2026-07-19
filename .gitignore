@@ -1,16 +1,16 @@
-# Build output
-/build/
-
-# Java
+# Fichiers générés Java
+build/
 *.class
 *.jar
-!lib/servlet-api.jar
-!lib/mysql-connector-j-9.5.0.jar
-!test-app/WebContent/WEB-INF/lib/framework.jar
+*.war
 
-# IDE
-/.idea/
-*.iml
+# Fichiers de compilation
+framework-sources.txt
+app-sources.txt
 
-# OS
-.DS_Store
+# Déploiement test
+test-app/WebContent/WEB-INF/classes/
+test-app/WebContent/WEB-INF/lib/
+
+# Fichiers temporaires
+*.log

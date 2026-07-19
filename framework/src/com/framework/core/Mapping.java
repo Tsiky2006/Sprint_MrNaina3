@@ -1,23 +1,32 @@
 package com.framework.core;
 
-public class Mapping {
+import java.lang.reflect.Method;
 
-    private String className;
-    private String methodName;
+public class Mapping {
+    private Class<?> controllerClass;
+    private Method method;
 
     public Mapping() {
     }
 
-    public Mapping(String className, String methodName) {
-        this.className = className;
-        this.methodName = methodName;
+    public Mapping(Class<?> controllerClass, Method method) {
+        this.controllerClass = controllerClass;
+        this.method = method;
     }
 
-    public String getClassName() {
-        return className;
+    public Class<?> getControllerClass() {
+        return controllerClass;
     }
 
-    public String getMethodName() {
-        return methodName;
+    public void setControllerClass(Class<?> controllerClass) {
+        this.controllerClass = controllerClass;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
     }
 }
