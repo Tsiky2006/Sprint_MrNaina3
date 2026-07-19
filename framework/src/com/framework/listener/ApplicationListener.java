@@ -1,5 +1,7 @@
 package com.framework.listener;
 
+import com.framework.core.DatabaseConfig;
+import com.framework.core.FrameworkContext;
 import com.framework.core.Mapping;
 import com.framework.util.Utilitaire;
 
@@ -17,27 +19,55 @@ public class ApplicationListener implements ServletContextListener {
             ServletContext context = sce.getServletContext();
 
             String controllerPackage = context.getInitParameter("controller");
+            String repositoryPackage = context.getInitParameter("repository");
 
             if (controllerPackage == null || controllerPackage.trim().isEmpty()) {
-                throw new Exception("Le paramètre 'controller' est introuvable dans web.xml");
+                throw new Exception("Le paramètre controller est introuvable dans web.xml");
             }
 
-            String packagePath = controllerPackage.replace(".", "/");
+            String jdbcDriver = context.getInitParameter("jdbcDriver");
+            String jdbcUrl = context.getInitParameter("jdbcUrl");
+            String jdbcUser = context.getInitParameter("jdbcUser");
+            String jdbcPassword = context.getInitParameter("jdbcPassword");
 
-            String realPath = context.getRealPath("/WEB-INF/classes/" + packagePath);
+            FrameworkContext frameworkContext = new FrameworkContext();
+
+            DatabaseConfig databaseConfig = new DatabaseConfig(
+                    jdbcDriver,
+                    jdbcUrl,
+                    jdbcUser,
+                    jdbcPassword
+            );
+
+            frameworkContext.registerBean(DatabaseConfig.class, databaseConfig);
+
+            if (repositoryPackage != null && !repositoryPackage.trim().isEmpty()) {
+                String repositoryPath = repositoryPackage.replace(".", "/");
+                String repositoryRealPath = context.getRealPath("/WEB-INF/classes/" + repositoryPath);
+
+                Utilitaire.scanRepositories(repositoryPackage, repositoryRealPath, frameworkContext);
+            }
+
+            String controllerPath = controllerPackage.replace(".", "/");
+            String controllerRealPath = context.getRealPath("/WEB-INF/classes/" + controllerPath);
 
             HashMap<String, Mapping> urlMapping = new HashMap<>();
 
-            Utilitaire.getUrlAndMethod(controllerPackage, realPath, urlMapping);
+            Utilitaire.getUrlAndMethod(controllerPackage, controllerRealPath, urlMapping);
+
+            for (Mapping mapping : urlMapping.values()) {
+                frameworkContext.getBean(mapping.getControllerClass());
+            }
 
             context.setAttribute("urlMapping", urlMapping);
-
+            context.setAttribute("frameworkContext", frameworkContext);
             context.setAttribute("viewPrefix", context.getInitParameter("viewPrefix"));
             context.setAttribute("viewSuffix", context.getInitParameter("viewSuffix"));
 
             System.out.println("====================================");
-            System.out.println("Framework initialise");
+            System.out.println("Framework initialise Sprint 5-2");
             System.out.println("Package controller : " + controllerPackage);
+            System.out.println("Package repository : " + repositoryPackage);
             System.out.println("Nombre URL trouvees : " + urlMapping.size());
             System.out.println("URLs disponibles : " + urlMapping.keySet());
             System.out.println("====================================");

@@ -1,7 +1,9 @@
 package com.framework.util;
 
 import com.framework.annotation.Controller;
+import com.framework.annotation.Repository;
 import com.framework.annotation.Url;
+import com.framework.core.FrameworkContext;
 import com.framework.core.Mapping;
 
 import java.io.File;
@@ -19,10 +21,10 @@ public class Utilitaire {
             throw new Exception("Dossier controller introuvable : " + realPath);
         }
 
-        scanFolder(folder, packageName, urlMapping);
+        scanControllerFolder(folder, packageName, urlMapping);
     }
 
-    private static void scanFolder(File folder, String packageName, HashMap<String, Mapping> urlMapping)
+    private static void scanControllerFolder(File folder, String packageName, HashMap<String, Mapping> urlMapping)
             throws Exception {
 
         File[] files = folder.listFiles();
@@ -34,7 +36,7 @@ public class Utilitaire {
         for (File file : files) {
 
             if (file.isDirectory()) {
-                scanFolder(file, packageName + "." + file.getName(), urlMapping);
+                scanControllerFolder(file, packageName + "." + file.getName(), urlMapping);
             }
 
             if (file.isFile() && file.getName().endsWith(".class") && !file.getName().contains("$")) {
@@ -63,6 +65,48 @@ public class Utilitaire {
                             urlMapping.put(url, new Mapping(clazz, method));
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public static void scanRepositories(String packageName, String realPath, FrameworkContext frameworkContext)
+            throws Exception {
+
+        File folder = new File(realPath);
+
+        if (!folder.exists()) {
+            System.out.println("Dossier repository introuvable : " + realPath);
+            return;
+        }
+
+        scanRepositoryFolder(folder, packageName, frameworkContext);
+    }
+
+    private static void scanRepositoryFolder(File folder, String packageName, FrameworkContext frameworkContext)
+            throws Exception {
+
+        File[] files = folder.listFiles();
+
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+
+            if (file.isDirectory()) {
+                scanRepositoryFolder(file, packageName + "." + file.getName(), frameworkContext);
+            }
+
+            if (file.isFile() && file.getName().endsWith(".class") && !file.getName().contains("$")) {
+                String className = packageName + "."
+                        + file.getName().substring(0, file.getName().length() - 6);
+
+                Class<?> clazz = Class.forName(className);
+
+                if (clazz.isAnnotationPresent(Repository.class)) {
+                    frameworkContext.getBean(clazz);
+                    System.out.println("Repository chargé : " + clazz.getName());
                 }
             }
         }
