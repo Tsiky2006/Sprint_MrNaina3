@@ -30,7 +30,7 @@ Fonctionnalité Sprint(0) :
   lay anarana afaka atao am le anotation
 - creer class annotena any le anotation vo créena io 
 
-- Maintenant l’objectif est de faire comme Spring : URL /employe/liste → EmployeController → méthode liste()
+- Maintenant l’objectif est de faire comme Spring : URL /employe/liste → EmployeController → méthode liste() [ok]
 
 
 
@@ -55,7 +55,7 @@ code framework tsy deploien zany fa mijanona .jar
 annotation controller => soit izy retraretra de tsara indrindra omena liste package
 raha manana anarana package ah de aona ny ananako any le 
 utilitaire class no misy methode ray izay mandray any le package
-method ray : misy ve ty sa tsisy au niveau class, attribut, sa methode 
+method ray : misy ve ty sa tsisy au niveau class, attribut, sa methode  [ok]
 
 
 
@@ -81,10 +81,35 @@ mila list any le url
 rehefa tsy fantatra le url ; de eto ny url hoe eo no misy any le list 
 tenenina izay misy any le url 
 
-rhefa tsy fantatra de hoe reto iany fantatra 
+
+rhefa tsy fantatra de hoe reto iany fantatra [en cours]
 
 
 
 
+Fonctionnalité Sprint (3) : 
+mizara roa : 
+
+tohany le 2 : 
+
+manana test controlle manana url test (tsy afaka manao otrany zao alony)
+map<url
+miova annotation
+miova map lasa instance na url methode,
 
 
+
+
+sprint 3 bis
+atsoina le methode 
+de recuperena le methode de invoquena 
+verifiena any am console hoe natsoina 
+
+
+meme url mais l'un peut etre POST et l'autre GET 
+ex : @urlmapping("/test) - GET
+     @urlmapping("/test) - POST
+     crée class URLMethod : url,method GET/POST
+
+Sprint 3bis : 
+rehefa fantatra le methode executena  (invoke) sans creer l'instance (ao anaty ProcessRequest)
