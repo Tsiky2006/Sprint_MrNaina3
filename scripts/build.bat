@@ -1,111 +1,60 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
+cd /d "%~dp0.."
 
-REM Script de compilation pour Windows
-set PROJECT_ROOT=%~dp0..
-set PROJECT_NAME=Sprint_MrNaina3
-set SERVLET_JAR=%PROJECT_ROOT%\lib\servlet-api.jar
+if not exist "lib\servlet-api.jar" (
+    echo ERREUR : servlet-api.jar introuvable.
+    exit /b 1
+)
 
-cd /d "%PROJECT_ROOT%"
+if not exist "lib\gson-2.11.0.jar" (
+    echo ERREUR : gson-2.11.0.jar introuvable.
+    exit /b 1
+)
 
-REM Nettoyage
 echo Nettoyage...
-if exist build rmdir /s /q build
-if exist framework.jar del /f framework.jar
+if exist "build" rmdir /s /q "build"
+if exist "build" goto :error
 
-REM Création des répertoires
-echo Creation des repertoires...
-mkdir build\framework-classes
-mkdir build\test-classes
-mkdir build\webapp\WEB-INF\classes
-mkdir test-app\WebContent\WEB-INF\lib
+mkdir "build\framework-classes"
+mkdir "build\test-classes"
+mkdir "build\webapp\WEB-INF\classes"
 
-REM Compilation du framework
-echo.
-echo ========================================
+if not exist "test-app\WebContent\WEB-INF\lib" (
+    mkdir "test-app\WebContent\WEB-INF\lib"
+)
+
 echo Compilation du framework...
-echo ========================================
+javac --release 17 -encoding UTF-8 -cp "lib\servlet-api.jar;lib\gson-2.11.0.jar" -d "build\framework-classes" framework\src\com\framework\annotation\*.java framework\src\com\framework\core\*.java framework\src\com\framework\util\*.java framework\src\com\framework\listener\*.java framework\src\com\framework\FrontController.java
+if errorlevel 1 goto :error
 
-javac -cp "%SERVLET_JAR%" ^
--d build\framework-classes ^
-framework\src\com\framework\annotation\*.java ^
-framework\src\com\framework\core\*.java ^
-framework\src\com\framework\util\*.java ^framework\src\com\framework\listener\*.java ^framework\src\com\framework\Model.java ^
-framework\src\com\framework\FrontController.java
-
-if errorlevel 1 (
-    echo ERREUR: Compilation du framework echouee
-    pause
-    exit /b 1
-)
-
-echo Framework compile avec succes
-
-REM Création du JAR du framework
-echo.
 echo Creation du framework.jar...
-cd /d "%PROJECT_ROOT%\build\framework-classes"
-jar cf "%PROJECT_ROOT%\framework.jar" -C . .
-cd /d "%PROJECT_ROOT%"
+jar cf "framework.jar" -C "build\framework-classes" .
+if errorlevel 1 goto :error
 
-if not exist framework.jar (
-    echo ERREUR: Echec creation framework.jar
-    pause
-    exit /b 1
-)
+copy /Y "framework.jar" "test-app\WebContent\WEB-INF\lib\"
+if errorlevel 1 goto :error
 
-REM Copie du JAR dans test-app
-copy framework.jar test-app\WebContent\WEB-INF\lib\
+copy /Y "lib\gson-2.11.0.jar" "test-app\WebContent\WEB-INF\lib\"
+if errorlevel 1 goto :error
 
-echo framework.jar cree et copie avec succes
-
-REM Compilation de l'application test
-echo.
-echo ========================================
 echo Compilation de l'application test...
-echo ========================================
+javac --release 17 -encoding UTF-8 -cp "lib\servlet-api.jar;framework.jar;lib\gson-2.11.0.jar" -d "build\test-classes" test-app\src\com\test\controller\*.java test-app\src\com\test\controller\dto\*.java test-app\src\com\test\model\*.java
+if errorlevel 1 goto :error
 
-javac -cp "%SERVLET_JAR%;framework.jar" ^
--d build\test-classes ^
-test-app\src\com\test\controller\*.java
+xcopy "build\test-classes\*" "build\webapp\WEB-INF\classes\" /E /I /Y
+if errorlevel 1 goto :error
 
-if errorlevel 1 (
-    echo ERREUR: Compilation test-app echouee
-    pause
-    exit /b 1
-)
+xcopy "test-app\WebContent\*" "build\webapp\" /E /I /Y
+if errorlevel 1 goto :error
 
-echo Application test compilée avec succes
-
-REM Copie des classes compilées
-echo.
-echo Copie des classes compilees...
-xcopy /E /I /Y build\test-classes\com build\webapp\WEB-INF\classes\com
-
-REM Copie du contenu web
-echo Copie du contenu web...
-xcopy /E /I /Y test-app\WebContent\* build\webapp\
-
-REM Création du WAR
-echo.
-echo ========================================
 echo Creation du WAR...
-echo ========================================
+jar cf "build\Sprint_MrNaina3.war" -C "build\webapp" .
+if errorlevel 1 goto :error
 
-cd /d "%PROJECT_ROOT%\build\webapp"
-jar cf "%PROJECT_ROOT%\build\%PROJECT_NAME%.war" -C . .
-cd /d "%PROJECT_ROOT%"
+echo BUILD REUSSI : build\Sprint_MrNaina3.war
+exit /b 0
 
-if exist build\%PROJECT_NAME%.war (
-    echo.
-    echo ========================================
-    echo BUILD REUSSI!
-    echo ========================================
-    echo WAR cree: build\%PROJECT_NAME%.war
-    echo.
-    pause
-) else (
-    echo ERREUR: Echec creation WAR
-    pause
-    exit /b 1
-)
+:error
+echo ECHEC : verifier les erreurs ci-dessus.
+exit /b 1
