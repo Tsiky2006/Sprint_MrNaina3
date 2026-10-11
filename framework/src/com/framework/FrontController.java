@@ -61,7 +61,7 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
-            // Verification HTTP des routes du formulaire existant.
+            // Verification HTTP des routes existantes du formulaire.
             if ("/emp/new".equals(url)
                     && !"GET".equals(request.getMethod())) {
                 response.setHeader("Allow", "GET");
@@ -102,11 +102,12 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
+            // Appeler l'action du controleur.
             Object result = method.invoke(
                     controllerInstance, arguments
             );
 
-            // Sprint 6 : retourner du JSON.
+            // Sprint 6 : retourner le resultat en JSON.
             if (method.isAnnotationPresent(WebApi.class)
                     || controllerClass.isAnnotationPresent(WebApi.class)) {
 
@@ -119,7 +120,7 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
-            // Sinon, afficher une vue JSP.
+            // Sans WebApi, le resultat indique une vue JSP.
             if (!(result instanceof String)) {
                 throw new ServletException(
                         "La methode " + method.getName()

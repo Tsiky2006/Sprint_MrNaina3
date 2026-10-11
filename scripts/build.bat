@@ -39,7 +39,16 @@ copy /Y "lib\gson-2.11.0.jar" "test-app\WebContent\WEB-INF\lib\"
 if errorlevel 1 goto :error
 
 echo Compilation de l'application test...
-javac --release 17 -encoding UTF-8 -cp "lib\servlet-api.jar;framework.jar;lib\gson-2.11.0.jar" -d "build\test-classes" test-app\src\com\test\controller\*.java test-app\src\com\test\controller\dto\*.java test-app\src\com\test\model\*.java
+
+REM Chemins relatifs avec des slashs pour la liste javac.
+(for /r "test-app\src" %%F in (*.java) do (
+    for %%R in ("test-app\src") do (
+        set "JAVA_SOURCE=%%F"
+        call :source
+    )
+)) > "build\test-sources.txt"
+
+javac --release 17 -encoding UTF-8 -cp "lib\servlet-api.jar;framework.jar;lib\gson-2.11.0.jar" -d "build\test-classes" @"build\test-sources.txt"
 if errorlevel 1 goto :error
 
 xcopy "build\test-classes\*" "build\webapp\WEB-INF\classes\" /E /I /Y
@@ -53,6 +62,11 @@ jar cf "build\Sprint_MrNaina3.war" -C "build\webapp" .
 if errorlevel 1 goto :error
 
 echo BUILD REUSSI : build\Sprint_MrNaina3.war
+exit /b 0
+
+:source
+set "JAVA_SOURCE=%JAVA_SOURCE:\=/%"
+echo "%JAVA_SOURCE%"
 exit /b 0
 
 :error
