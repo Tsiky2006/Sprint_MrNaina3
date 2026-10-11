@@ -3,6 +3,7 @@ package com.framework;
 import com.framework.core.FrameworkContext;
 import com.framework.core.Mapping;
 import com.framework.core.Model;
+import com.framework.util.ParameterBinder;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+
+import com.framework.annotation.WebApi;
+import com.google.gson.Gson;
 
 public class FrontController extends HttpServlet {
 
@@ -83,26 +88,42 @@ public class FrontController extends HttpServlet {
             Method method = mapping.getMethod();
 
             Object controllerInstance = frameworkContext.getBean(controllerClass);
+        
+        // Sprint 7 : récupérer et convertir les paramètres GET ou POST.
+        Model model = new Model();
+        Object[] arguments;
 
-            Model model = new Model();
-            Object result;
+        try {
+            arguments = ParameterBinder.bind(method, request, model);
+        } catch (IllegalArgumentException e) {
+             response.sendError(
+            HttpServletResponse.SC_BAD_REQUEST,
+            e.getMessage()
+        );
+         return;
+        }
 
-            if (method.getParameterCount() == 0) {
-                result = method.invoke(controllerInstance);
-            } else if (
-                    method.getParameterCount() == 1 &&
-                    method.getParameterTypes()[0].equals(Model.class)
-            ) {
-                result = method.invoke(controllerInstance, model);
-            } else {
-                throw new Exception("La méthode " + method.getName()
-                        + " doit avoir 0 paramètre ou 1 paramètre de type Model");
+        // Appeler la méthode avec les valeurs préparées.
+        Object result = method.invoke(controllerInstance, arguments);
+
+            // Sprint 6 : annotation sur la méthode OU sur la classe.
+            if (method.isAnnotationPresent(WebApi.class)
+                    || controllerClass.isAnnotationPresent(WebApi.class)) {
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(new Gson().toJson(result));
+
+                return; // Ne pas ouvrir de JSP.
             }
 
+            // Sans @WebApi : continuer vers la vue JSP.
             if (!(result instanceof String)) {
                 throw new Exception("La méthode " + method.getName()
                         + " doit retourner un String");
             }
+
+          
 
             for (Map.Entry<String, Object> entry : model.getData().entrySet()) {
                 request.setAttribute(entry.getKey(), entry.getValue());
