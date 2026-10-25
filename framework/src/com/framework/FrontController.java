@@ -87,6 +87,7 @@ public class FrontController extends HttpServlet {
                     frameworkContext.getBean(controllerClass);
 
             // Sprints 7 et 7 bis : preparer les arguments.
+            // miantso ny methode avec l'objet 
             Model model = new Model();
             Object[] arguments;
 
@@ -151,7 +152,7 @@ public class FrontController extends HttpServlet {
 
             String viewName = (String) result;
 
-            if (viewName.startsWith("/")) {
+            if (viewName.startsWith("/")) { 
                 viewName = viewName.substring(1);
             }
 

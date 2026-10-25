@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import jakarta.servlet.http.HttpSession;
 
 public class ParameterBinder {
 
@@ -29,6 +30,11 @@ public class ParameterBinder {
 
             if (type == Model.class) {
                 arguments[i] = model;
+                continue;
+            }
+            // Sprint 9 : injection de la session dans le contrôleur.
+            if (type == HttpSession.class) {
+                arguments[i] = request.getSession();
                 continue;
             }
 
