@@ -1,17 +1,17 @@
 package com.framework;
 
+import com.framework.annotation.WebApi;
 import com.framework.core.FrameworkContext;
 import com.framework.core.Mapping;
 import com.framework.core.Model;
 import com.framework.util.ParameterBinder;
+import com.google.gson.Gson;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.framework.annotation.WebApi;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -19,8 +19,8 @@ import java.util.Map;
 
 public class FrontController extends HttpServlet {
 
-    @SuppressWarnings("unchecked")
     @Override
+    @SuppressWarnings("unchecked")
     protected void service(
             HttpServletRequest request,
             HttpServletResponse response
@@ -40,7 +40,7 @@ public class FrontController extends HttpServlet {
 
             if (urlMapping == null || frameworkContext == null) {
                 throw new ServletException(
-                        "Le framework n'est pas initialisÃ©."
+                        "Le framework n'est pas initialise."
                 );
             }
 
@@ -61,8 +61,7 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
-            // VÃ©rification HTTP pour les deux routes de cet exemple.
-            // Le mapping gÃ©nÃ©ral GET/POST reste Ã  ajouter au framework.
+            // Verification HTTP des routes existantes du formulaire.
             if ("/emp/new".equals(url)
                     && !"GET".equals(request.getMethod())) {
                 response.setHeader("Allow", "GET");
@@ -81,17 +80,21 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
+            Class<?> controllerClass = mapping.getControllerClass();
             Method method = mapping.getMethod();
 
             Object controllerInstance =
-                    frameworkContext.getBean(mapping.getControllerClass());
+                    frameworkContext.getBean(controllerClass);
 
+            // Sprints 7 et 7 bis : preparer les arguments.
+            // miantso ny methode avec l'objet 
             Model model = new Model();
             Object[] arguments;
 
             try {
-                // Sprint 7 : rÃ©cupÃ©rer et convertir les paramÃ¨tres.
-                arguments = ParameterBinder.bind(method, request, model);
+                arguments = ParameterBinder.bind(
+                        method, request, model
+                );
             } catch (IllegalArgumentException e) {
                 response.sendError(
                         HttpServletResponse.SC_BAD_REQUEST,
@@ -100,24 +103,37 @@ public class FrontController extends HttpServlet {
                 return;
             }
 
-            // Appeler la mÃ©thode avec les valeurs rÃ©cupÃ©rÃ©es.
-            Object result = method.invoke(controllerInstance, arguments);
-            if ((method.isAnnotationPresent(WebApi.class) || mapping.getControllerClass().isAnnotationPresent(WebApi.class))) {
-             response.setContentType("application/json;charset=UTF-8");
-             response.getWriter().write(new Gson().toJson(result));
-             return;
-}
+            // Appeler l'action du controleur.
+            Object result = method.invoke(
+                    controllerInstance, arguments
+            );
 
+            // Sprint 6 : retourner le resultat en JSON.
+            if (method.isAnnotationPresent(WebApi.class)
+                    || controllerClass.isAnnotationPresent(WebApi.class)) {
+
+                response.setContentType(
+                        "application/json;charset=UTF-8"
+                );
+                response.getWriter().write(
+                        new Gson().toJson(result)
+                );
+                return;
+            }
+
+            // Sans WebApi, le resultat indique une vue JSP.
             if (!(result instanceof String)) {
                 throw new ServletException(
-                        "La mÃ©thode " + method.getName()
-                        + " doit retourner un String."
+                        "La methode " + method.getName()
+                                + " doit retourner un String."
                 );
             }
 
             for (Map.Entry<String, Object> entry
                     : model.getData().entrySet()) {
-                request.setAttribute(entry.getKey(), entry.getValue());
+                request.setAttribute(
+                        entry.getKey(), entry.getValue()
+                );
             }
 
             String viewPrefix = (String) getServletContext()
@@ -136,7 +152,7 @@ public class FrontController extends HttpServlet {
 
             String viewName = (String) result;
 
-            if (viewName.startsWith("/")) {
+            if (viewName.startsWith("/")) { 
                 viewName = viewName.substring(1);
             }
 
@@ -148,7 +164,9 @@ public class FrontController extends HttpServlet {
             dispatcher.forward(request, response);
 
         } catch (Exception e) {
-            throw new ServletException("Erreur dans FrontController", e);
+            throw new ServletException(
+                    "Erreur dans FrontController", e
+            );
         }
     }
 }
