@@ -12,12 +12,33 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.framework.annotation.Authenticated;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
 public class FrontController extends HttpServlet {
+
+        private String authSessionAttribute;
+
+        @Override
+        public void init() throws ServletException {
+        super.init();
+
+        authSessionAttribute = getServletContext()
+            .getInitParameter("auth-session-attribute");
+
+        if (authSessionAttribute == null
+            || authSessionAttribute.trim().isEmpty()) {
+        throw new ServletException(
+                "Configuration manquante : auth-session-attribute"
+        );
+         }
+
+         authSessionAttribute = authSessionAttribute.trim();
+        }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -83,7 +104,23 @@ public class FrontController extends HttpServlet {
             Class<?> controllerClass = mapping.getControllerClass();
             Method method = mapping.getMethod();
 
-            Object controllerInstance =
+         // Sprint 10 : proteger les actions annotees.
+         if (method.isAnnotationPresent(Authenticated.class)) {
+
+                 HttpSession session = request.getSession(false);
+
+                if (session == null
+                 || session.getAttribute(authSessionAttribute) == null) {
+
+                response.sendError(
+                HttpServletResponse.SC_UNAUTHORIZED,
+                "Vous devez etre connecte pour acceder a cette action."
+                );
+                return;
+                }
+        }
+
+         Object controllerInstance =
                     frameworkContext.getBean(controllerClass);
 
             // Sprints 7 et 7 bis : preparer les arguments.
