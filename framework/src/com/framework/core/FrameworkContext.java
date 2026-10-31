@@ -9,11 +9,11 @@ import java.util.Map;
 public class FrameworkContext {
     private Map<Class<?>, Object> beans = new HashMap<>();
 
-    public void registerBean(Class<?> clazz, Object instance) {
+       public synchronized void registerBean(Class<?> clazz, Object instance) {
         beans.put(clazz, instance);
     }
-
-    public <T> T getBean(Class<T> clazz) throws Exception {
+        // Sprint 11 : reutiliser une seule instance par classe.
+        public synchronized <T> T getBean(Class<T> clazz) throws Exception {
         if (beans.containsKey(clazz)) {
             return clazz.cast(beans.get(clazz));
         }
