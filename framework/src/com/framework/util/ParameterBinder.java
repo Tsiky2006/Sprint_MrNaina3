@@ -33,9 +33,9 @@ public class ParameterBinder {
                 continue;
             }
             // Sprint 9 : injection de la session dans le contrôleur.
-            if (type == HttpSession.class) {
-                arguments[i] = request.getSession();
-                continue;
+             if (type == HttpSession.class) {
+            arguments[i] = request.getSession();
+            continue;
             }
 
             // Sprint 7 bis : objet contenant plusieurs attributs.
