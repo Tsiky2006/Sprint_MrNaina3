@@ -172,7 +172,8 @@ if (method.isAnnotationPresent(Authenticated.class)
         }
     }
 }
-
+        // Sprint 11 : recuperer l'instance partagee du controleur.
+        // FrameworkContext la cree au premier appel, puis la reutilise
         Object controllerInstance =
         frameworkContext.getBean(controllerClass);
 
