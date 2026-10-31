@@ -14,114 +14,167 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.framework.annotation.Authenticated;
 import jakarta.servlet.http.HttpSession;
+import com.framework.annotation.RolesAllowed;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Collection;
 
 public class FrontController extends HttpServlet {
 
         private String authSessionAttribute;
+        private String rolesSessionAttribute;
+
 
         @Override
-        public void init() throws ServletException {
-        super.init();
+public void init() throws ServletException {
+    super.init();
 
-        authSessionAttribute = getServletContext()
+    authSessionAttribute = getServletContext()
             .getInitParameter("auth-session-attribute");
 
-        if (authSessionAttribute == null
+    rolesSessionAttribute = getServletContext()
+            .getInitParameter("role-session-attribute");
+
+    if (authSessionAttribute == null
             || authSessionAttribute.trim().isEmpty()) {
         throw new ServletException(
                 "Configuration manquante : auth-session-attribute"
         );
-         }
+    }
 
-         authSessionAttribute = authSessionAttribute.trim();
+    if (rolesSessionAttribute == null
+            || rolesSessionAttribute.trim().isEmpty()) {
+        throw new ServletException(
+                "Configuration manquante : role-session-attribute"
+        );
+    }
+
+    authSessionAttribute = authSessionAttribute.trim();
+    rolesSessionAttribute = rolesSessionAttribute.trim();
+}
+
+
+@SuppressWarnings("unchecked")
+protected void service(
+        HttpServletRequest request,
+        HttpServletResponse response
+) throws ServletException, IOException {
+
+    request.setCharacterEncoding("UTF-8");
+    response.setContentType("text/html;charset=UTF-8");
+
+    try {
+        Map<String, Mapping> urlMapping =
+                (Map<String, Mapping>) getServletContext()
+                        .getAttribute("urlMapping");
+
+        FrameworkContext frameworkContext =
+                (FrameworkContext) getServletContext()
+                        .getAttribute("frameworkContext");
+
+        if (urlMapping == null || frameworkContext == null) {
+            throw new ServletException(
+                    "Le framework n'est pas initialise."
+            );
         }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void service(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws ServletException, IOException {
+        String url = request.getRequestURI()
+                .substring(request.getContextPath().length());
 
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
+        if (url.isEmpty()) {
+            url = "/";
+        }
 
-        try {
-            Map<String, Mapping> urlMapping =
-                    (Map<String, Mapping>) getServletContext()
-                            .getAttribute("urlMapping");
+        Mapping mapping = urlMapping.get(url);
 
-            FrameworkContext frameworkContext =
-                    (FrameworkContext) getServletContext()
-                            .getAttribute("frameworkContext");
+        if (mapping == null) {
+            response.sendError(
+                    HttpServletResponse.SC_NOT_FOUND,
+                    "URL inconnue"
+            );
+            return;
+        }
 
-            if (urlMapping == null || frameworkContext == null) {
-                throw new ServletException(
-                        "Le framework n'est pas initialise."
-                );
-            }
+        if ("/emp/new".equals(url)
+                && !"GET".equals(request.getMethod())) {
+            response.setHeader("Allow", "GET");
+            response.sendError(
+                    HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            );
+            return;
+        }
 
-            String url = request.getRequestURI()
-                    .substring(request.getContextPath().length());
+        if ("/emp/save".equals(url)
+                && !"POST".equals(request.getMethod())) {
+            response.setHeader("Allow", "POST");
+            response.sendError(
+                    HttpServletResponse.SC_METHOD_NOT_ALLOWED
+            );
+            return;
+        }
 
-            if (url.isEmpty()) {
-                url = "/";
-            }
+        Class<?> controllerClass = mapping.getControllerClass();
+        Method method = mapping.getMethod();
 
-            Mapping mapping = urlMapping.get(url);
 
-            if (mapping == null) {
-                response.sendError(
-                        HttpServletResponse.SC_NOT_FOUND,
-                        "URL inconnue"
-                );
-                return;
-            }
+// Sprints 10 et 10 bis : verifier connexion et roles.
+RolesAllowed rolesAllowed =
+        method.getAnnotation(RolesAllowed.class);
 
-            // Verification HTTP des routes existantes du formulaire.
-            if ("/emp/new".equals(url)
-                    && !"GET".equals(request.getMethod())) {
-                response.setHeader("Allow", "GET");
-                response.sendError(
-                        HttpServletResponse.SC_METHOD_NOT_ALLOWED
-                );
-                return;
-            }
+if (method.isAnnotationPresent(Authenticated.class)
+        || rolesAllowed != null) {
 
-            if ("/emp/save".equals(url)
-                    && !"POST".equals(request.getMethod())) {
-                response.setHeader("Allow", "POST");
-                response.sendError(
-                        HttpServletResponse.SC_METHOD_NOT_ALLOWED
-                );
-                return;
-            }
+    HttpSession session = request.getSession(false);
 
-            Class<?> controllerClass = mapping.getControllerClass();
-            Method method = mapping.getMethod();
+    // Verifier d'abord que l'utilisateur est connecte.
+    if (session == null
+            || session.getAttribute(authSessionAttribute) == null) {
 
-         // Sprint 10 : proteger les actions annotees.
-         if (method.isAnnotationPresent(Authenticated.class)) {
-
-                 HttpSession session = request.getSession(false);
-
-                if (session == null
-                 || session.getAttribute(authSessionAttribute) == null) {
-
-                response.sendError(
+        response.sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                "Vous devez etre connecte pour acceder a cette action."
-                );
-                return;
-                }
+                "Vous devez etre connecte."
+        );
+        return;
+    }
+
+    // Puis verifier les roles si l'action en exige.
+    if (rolesAllowed != null) {
+
+        Object userRoles =
+                session.getAttribute(rolesSessionAttribute);
+
+        boolean autorise = false;
+
+        for (String requiredRole : rolesAllowed.value()) {
+
+            if (userRoles instanceof String
+                    && requiredRole.equals(userRoles)) {
+                autorise = true;
+                break;
+            }
+
+            if (userRoles instanceof Collection<?>
+                    && ((Collection<?>) userRoles)
+                            .contains(requiredRole)) {
+                autorise = true;
+                break;
+            }
         }
 
-         Object controllerInstance =
-                    frameworkContext.getBean(controllerClass);
+        if (!autorise) {
+            response.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Vous ne possedez pas le role necessaire."
+            );
+            return;
+        }
+    }
+}
+
+        Object controllerInstance =
+        frameworkContext.getBean(controllerClass);
 
             // Sprints 7 et 7 bis : preparer les arguments.
             // miantso ny methode avec l'objet 
